@@ -1,4 +1,4 @@
-const captainModel = require("../models/captin.model");
+const captainModel = require("../models/captain.model");
 const captainservice = require("../services/captain.service");
 const { validationResult } = require("express-validator");
 
@@ -8,7 +8,7 @@ module.exports.registerCaptain = async (req, res, next) => {
     if (!errors.isEmpty()) {
         return  res.status(400).json({ errors: errors.array() });
     }
-    const { fullname, email, password, color, plate, capacity, vehicleType } = req.body;
+    const { fullname, email, password, vehicle } = req.body;
 
     const captainExists = await captainModel.findOne({ email });
     if (captainExists) {
@@ -22,10 +22,10 @@ module.exports.registerCaptain = async (req, res, next) => {
         lastname: fullname.lastname,
         email,
         password: hashedPassword,
-        color,
-        plate,
-        capacity,
-        vehicleType,
+        color: vehicle.color,
+        plate: vehicle.plate,
+        capacity: vehicle.capacity, 
+        vehicleType: vehicle.vehicleType,
     });
 
     const token = captain.generateAuthToken();
@@ -35,5 +35,34 @@ module.exports.registerCaptain = async (req, res, next) => {
         token,
     });
 
+
+}
+
+
+module.exports.logincaptain = async (req, res, next) => {
+    const errors = validationResult(req);   
+    if (!errors.isEmpty()) {
+        return  res.status(400).json({ errors: errors.array() });
+    }
+    const { email, password } = req.body;
+    const captain = await captainModel.findOne({ email }).select("+password");
+  
+    console.log(captain);   
+
+    if (!captain) {
+        return res.status(401).json({ message: "Invalid email or password" });
+    }
+    const isPasswordValid = await captain.comparePassword(password);
+    if (!isPasswordValid) {
+        return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const token = captain.generateAuthToken();
+    res.cookie("token", token )
+    res.status(200).json({
+        message: "Login successful",
+       captain,
+        token,
+    });
 
 }

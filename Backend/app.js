@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 app.use('/users', userRoutes);
 
-app.use('/captin',captainRoutes )
+app.use('/captain',captainRoutes)
 
 
  
