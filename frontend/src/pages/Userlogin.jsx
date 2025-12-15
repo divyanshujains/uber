@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../axios/Axios';
 
 const Userlogin = () => {
 
@@ -8,7 +9,7 @@ const Userlogin = () => {
     const [password, setpassword] = useState('')
 
 
-    const submitHandler = (e) => {
+    const submitHandler = async (e) => {
         e.preventDefault();
       
         const logindata = {
@@ -16,7 +17,15 @@ const Userlogin = () => {
           password: password,
         }
 
-        console.log(logindata);
+        try {
+          const response = await api.post('/user/login', logindata);
+          console.log(response.data);
+
+          
+        } catch (error) {
+          console.error('Login failed:', error);
+          
+        }
        
 
 

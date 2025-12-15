@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Form, Link } from "react-router-dom";
+import api from "../axios/Axios";
 
 const Usersignup = () => {
-        
-
   const [firstname, setfirstname] = useState('');
   const [lastname, setlastname] = useState('');
   const [email, setemail] = useState('');
@@ -12,17 +11,28 @@ const Usersignup = () => {
 
 
 
-  const submitHandler = (e) => {
+  const submitHandler = async  (e) => {
     e.preventDefault();
 
     setdata ({
+      fullname:{
       firstname,
       lastname,
+      },
       email,
       password
     });
-
     console.log(data);
+
+    try {
+      const response = await api.post('/user/register', data);
+      console.log(response.data);
+      
+    } catch (error) {
+      console.log(error);
+    }
+
+    
   }
 
 
@@ -104,11 +114,10 @@ const Usersignup = () => {
           </div>
 
           {/* Signup Button */}
-          <Link
-         
+          <button
           className="w-full flex items-center justify-center bg-black text-white py-3 rounded-lg text-lg font-medium hover:bg-gray-900 transition">
             Sign up
-          </Link>
+          </button>
 
           {/* Footer */}
           <p className="text-center text-sm text-gray-600 mt-4">

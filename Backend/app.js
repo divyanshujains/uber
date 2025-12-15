@@ -9,14 +9,19 @@ const cookieParser = require("cookie-parser");
 
 
 dotenv.config();
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // frontend URL
+    credentials: true, // allow cookies
+  })
+);
 connectDB();
 app.use(express.json());
 
 app.use(cookieParser());
 
 
-app.use('/users', userRoutes);
+app.use('/user', userRoutes);
 
 app.use('/captain',captainRoutes)
 
