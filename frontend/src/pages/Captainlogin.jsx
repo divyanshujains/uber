@@ -1,18 +1,44 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../axios/Axios";
+import { CaptainDataContext } from "../context/Captaincontext";
 
 const Captainlogin = () => {
+
+  const navigate = useNavigate();
+
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const {captaindata, setcaptaindata} = useContext(CaptainDataContext);
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
+
     e.preventDefault();
     const logindata = {
       email,
       password,
     };
+
+
+    try {
+      const response = await api.post("/captain/login", logindata);
+      if(response){
+       localStorage.setItem("captainToken:",response.data.token)
+            setcaptaindata(response.data.captain)
+       console.log(response.data)
+       
+       navigate("/captainhome")
+      }
+      
+    } catch (error) {
+      console.log("Captain login error", error);
+      
+    }
     
+
+    
+      
+
   
 
 

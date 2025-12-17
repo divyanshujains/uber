@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Link } from "react-router-dom";
+import { Form, Link, useNavigate } from "react-router-dom";
 import api from "../axios/Axios";
 
 const Usersignup = () => {
@@ -7,26 +7,30 @@ const Usersignup = () => {
   const [lastname, setlastname] = useState('');
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
-  const [data, setdata] = useState({})
-
+  
 
 
   const submitHandler = async  (e) => {
     e.preventDefault();
-
-    setdata ({
-      fullname:{
+ 
+    const navigate = useNavigate();
+    
+   const payload = {
+    fullname: {
       firstname,
       lastname,
-      },
-      email,
-      password
-    });
-    console.log(data);
+    },
+    email,
+    password,
+  };
 
     try {
-      const response = await api.post('/user/register', data);
-      console.log(response.data);
+      const response = await api.post('/user/register', payload);
+    if(response){
+      navigate('/userlogin');  
+      const token = localStorage.setItem('userToken', response.data.token);
+      
+    }
       
     } catch (error) {
       console.log(error);

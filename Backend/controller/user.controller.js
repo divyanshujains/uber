@@ -8,34 +8,39 @@ module.exports.registerUser = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const { fullname, email, password } = req.body;
+  try {
+      const { fullname, email, password } = req.body;
+      console.log(req.body);
+      if (
+        !fullname ||
+        !email ||
+        !password
+      ) {
+        return res.status(400).json({
+          message: "All fields are required",
+        });
+      }
 
-  if (
-    !fullname ||
-    !fullname.firstname ||
-    !fullname.lastname ||
-    !email ||
-    !password
-  ) {
-    return res.status(400).json({
-      message: "All fields are required",
-    });
+      const hashedPassword = await userModel.hashPassword(password);
+      const user = await userService.createUser({
+        fullname,
+        email,
+        password: hashedPassword,
+      });
+
+      const token = user.generateAuthToken();
+      
+  res.cookie("token", token);
+  
+      res.status(201).json({
+        message: "User registered successfully",
+        user,
+        token,
+      });
+    
+  } catch (error) {
+     console.error("Error registering user:", error);
   }
-
-  const hashedPassword = await userModel.hashPassword(password);
-  const user = await userService.createUser({
-    firstname: fullname.firstname,
-    lastname: fullname.lastname,
-    email,
-    password: hashedPassword,
-  });
-
-  const token = user.generateAuthToken();
-  res.status(201).json({
-    message: "User registered successfully",
-    user,
-    token,
-  });
 };
 
 module.exports.loginUser = async (req, res, next) => {

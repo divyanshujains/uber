@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../axios/Axios";
+import { CaptainDataContext } from "../context/Captaincontext";
 
 const Captainsignup = () => {
   const [firstname, setFirstname] = useState("");
@@ -12,7 +14,11 @@ const Captainsignup = () => {
   const [vehiclePlate, setVehiclePlate] = useState("");
   const [vehicleCapacity, setVehicleCapacity] = useState("");
 
-  const submitHandler = (e) => {
+   const { captaindata, setcaptaindata } = useContext(CaptainDataContext);
+
+   const navigate = useNavigate()
+
+  const submitHandler = async (e) => {
     e.preventDefault();
 
     const signupData = {
@@ -29,8 +35,25 @@ const Captainsignup = () => {
         vehicleType,
       },
     };
-
     console.log(signupData);
+
+    try {
+      const response = await api.post("/captain/register", signupData);
+      if(response){
+        localStorage.setItem("token",response.data.token)
+        setcaptaindata(response.data.captain);
+        navigate("/captainhome");
+      }
+      console.log("Captain signup response", response);
+      
+    } catch (error) {
+      console.log("error:", error.response.data.message);
+      
+    }
+
+
+
+
   };
 
   return (

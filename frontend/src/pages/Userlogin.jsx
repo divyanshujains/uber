@@ -1,42 +1,42 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../axios/Axios';
+import {UserDataContext} from '../context/Usercontext';
 
 const Userlogin = () => {
 
-   const [email, setemail] = useState('')
-    const [password, setpassword] = useState('')
+  const navigate = useNavigate();
 
+  const {userdata , setuserdata} = useContext(UserDataContext);
+
+   const [email, setemail] = useState('')
+   const [password, setpassword] = useState('')
 
     const submitHandler = async (e) => {
         e.preventDefault();
-      
+        if(!email || !password){
+          alert('Please fill all the fields');
+          return;
+        }
         const logindata = {
           email: email,
           password: password,
         }
-
-        try {
+        try { 
           const response = await api.post('/user/login', logindata);
-          console.log(response.data);
-
-          
+             if(response){
+              setuserdata(response.data.user);
+              localStorage.setItem('userToken', response.data.token);
+              
+              navigate('/home');
+             }
         } catch (error) {
           console.error('Login failed:', error);
           
         }
        
-
-
-
-
-
     }
-
-
-
-
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -62,6 +62,7 @@ const Userlogin = () => {
               onChange={(e) => {
                 setemail(e.target.value);
               }}
+              
               type="email"
               placeholder="Enter your email"
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black"
@@ -75,6 +76,7 @@ const Userlogin = () => {
               onChange={(e) => {
                 setpassword(e.target.value);
               }}
+              minLength={3}
               type="password"
               placeholder="Enter your password"
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black"
