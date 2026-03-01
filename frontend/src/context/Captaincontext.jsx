@@ -1,10 +1,9 @@
-import React, { createContext, useState } from 'react'
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useState } from "react";
 
 export const CaptainDataContext = createContext();
 
-const Captaincontext = ({children}) => {
-
-
+const Captaincontext = ({ children }) => {
   const [captaindata, setcaptaindata] = useState({
     email: "",
     fullname: {
@@ -13,15 +12,13 @@ const Captaincontext = ({children}) => {
     },
   });
 
-
   return (
     <div>
-      <CaptainDataContext.Provider value={{captaindata, setcaptaindata}} >
+      <CaptainDataContext.Provider value={{ captaindata, setcaptaindata }}>
         {children}
       </CaptainDataContext.Provider>
-      
     </div>
-  )
-}
+  );
+};
 
-export default Captaincontext
+export default Captaincontext;

@@ -30,7 +30,7 @@ module.exports.registerCaptain = async (req, res, next) => {
     });
 
     const token = captain.generateAuthToken();
-     res.cookie("token", token);
+     res.cookie("captaintoken", token);
     res.status(201).json({
         message: "Captain registered successfully",
         captain,
@@ -60,7 +60,7 @@ module.exports.logincaptain = async (req, res, next) => {
     }
 
     const token = captain.generateAuthToken();
-    res.cookie("token", token )
+    res.cookie("captaintoken", token )
     res.status(200).json({
         message: "Login successful",
        captain,

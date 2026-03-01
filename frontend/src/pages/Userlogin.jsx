@@ -8,7 +8,7 @@ const Userlogin = () => {
 
   const navigate = useNavigate();
 
-  const {userdata , setuserdata} = useContext(UserDataContext);
+  const { setuserdata} = useContext(UserDataContext);
 
    const [email, setemail] = useState('')
    const [password, setpassword] = useState('')
@@ -27,7 +27,7 @@ const Userlogin = () => {
           const response = await api.post('/user/login', logindata);
              if(response){
               setuserdata(response.data.user);
-              localStorage.setItem('userToken', response.data.token);
+              localStorage.setItem("userToken", response.data.token);
               
               navigate('/home');
              }

@@ -14,7 +14,7 @@ const Captainsignup = () => {
   const [vehiclePlate, setVehiclePlate] = useState("");
   const [vehicleCapacity, setVehicleCapacity] = useState("");
 
-   const { captaindata, setcaptaindata } = useContext(CaptainDataContext);
+   const { setcaptaindata } = useContext(CaptainDataContext);
 
    const navigate = useNavigate()
 
@@ -40,7 +40,7 @@ const Captainsignup = () => {
     try {
       const response = await api.post("/captain/register", signupData);
       if(response){
-        localStorage.setItem("token",response.data.token)
+        localStorage.setItem("captaintoken",response.data.token)
         setcaptaindata(response.data.captain);
         navigate("/captainhome");
       }

@@ -13,7 +13,7 @@ import Captainhome from './pages/Captainhome'
 
 const App = () => {
   return (
-    <div>
+    <div className='rounded-2xl'>
       <Routes>
         <Route
           path="/home"

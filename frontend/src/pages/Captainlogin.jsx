@@ -9,7 +9,7 @@ const Captainlogin = () => {
 
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
-  const {captaindata, setcaptaindata} = useContext(CaptainDataContext);
+  const { setcaptaindata} = useContext(CaptainDataContext);
 
   const submitHandler = async (e) => {
 
