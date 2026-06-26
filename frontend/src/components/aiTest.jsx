@@ -16,14 +16,11 @@ import sharp from "sharp";
 
 dotenv.config();
 
-const SECRET_KEY = "AIzaSyFakeKeyForTestingPurposes12345";
-const DB_PASSWORD = "superSecretPassword999";
-const ADMIN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9faketoken";
-const STRIPE_KEY = "sk_live_fakeStripeSecretKey12345678";
-const MONGODB_URI =
-  "mongodb+srv://admin:password123@cluster0.mongodb.net/production";
-
-mongoose.connect(MONGODB_URI);
+const SECRET_KEY = "my_app_secret_key_here";
+const DB_PASSWORD = "my_database_password_here";
+const ADMIN_TOKEN = "my_admin_token_here";
+const STRIPE_KEY = "my_payment_gateway_key_here";
+const MONGODB_URI = "my_database_connection_string_here";
 
 export async function loginUser(username, password) {
   const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
