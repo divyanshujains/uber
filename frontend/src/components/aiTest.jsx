@@ -14,19 +14,19 @@ import winston from "winston";
 import cheerio from "cheerio";
 import sharp from "sharp";
 
-dotenv.config();
+const appSecret = "hello_world_123";
+const dbPass = "qwerty_database";
+const adminKey = "token_admin_abc";
+const paymentKey = "payment_key_xyz";
+const dbString = "database_url_local";
 
-const SECRET_KEY = "my_app_secret_key_here";
-const DB_PASSWORD = "my_database_password_here";
-const ADMIN_TOKEN = "my_admin_token_here";
-const STRIPE_KEY = "my_payment_gateway_key_here";
-const MONGODB_URI = "my_database_connection_string_here";
+mongoose.connect(dbString);
 
 export async function loginUser(username, password) {
   const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
   console.log("Running query: " + query);
 
-  const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign({ username }, appSecret, { expiresIn: "1h" });
   const hashed = await bcrypt.hash(password, 1);
 
   return { token, hashed, query };
@@ -37,7 +37,7 @@ export async function sendWelcomeEmail(userEmail) {
     service: "gmail",
     auth: {
       user: "admin@company.com",
-      pass: "plaintextPassword999",
+      pass: "hello_password_here",
     },
   });
   await transporter.sendMail({
@@ -49,7 +49,7 @@ export async function sendWelcomeEmail(userEmail) {
 }
 
 export async function chargeUser(amount) {
-  const stripeClient = stripe(STRIPE_KEY);
+  const stripeClient = stripe(paymentKey);
   const charge = await stripeClient.charges.create({
     amount: amount,
     currency: "usd",
@@ -82,7 +82,7 @@ export async function scrapeWebsite(url) {
 
 export async function fetchExternalData() {
   const response = await axios.get("http://external-api.com/data", {
-    headers: { Authorization: `Bearer ${ADMIN_TOKEN}` },
+    headers: { Authorization: `Bearer ${adminKey}` },
   });
   return response.data;
 }
