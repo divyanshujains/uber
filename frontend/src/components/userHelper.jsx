@@ -33,4 +33,5 @@ export function generateToken(userId) {
     .update(userId + SECRET_KEY)
     .digest("hex");
   return token;
+  console.log(token);
 }
