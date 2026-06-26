@@ -13,6 +13,7 @@ import Captainhome from './pages/Captainhome'
 
 const App = () => {
   return (
+
     <div className='rounded-2xl'>
       <Routes>
         <Route
@@ -38,6 +39,7 @@ const App = () => {
         ></Route>
       </Routes>
     </div>
+    
   );
 }
 

@@ -3,6 +3,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import "remixicon/fonts/remixicon.css";
 import Searchedlocation from './Searchedlocation';
+import Confirmride from './Confirmride';
 
 const Home = () => {
 
@@ -10,10 +11,12 @@ const Home = () => {
   const [destination, setdestination] = useState('')
   const [panelopen, setpanelopen] = useState(false);
   const [vehiclepanel, setvehiclepanel] = useState(false);
+  const [confirmridepanel, setconfirmridepanel] = useState(false)
 
 
   const panel = useRef(null);
   const vehiclepanelref = useRef(null);
+  const confirmridepanelref = useRef(null);
 
 
 
@@ -54,6 +57,16 @@ useGSAP(() => {
   }
 }, [vehiclepanel]);
 
+
+useGSAP(() => {
+  if (!confirmridepanelref.current) return;
+
+  gsap.to(confirmridepanelref.current, {
+    height: confirmridepanel ? "50%" : "0%",
+    duration: 0.5,
+    ease: "power2.out",
+  });
+}, [confirmridepanel]);
 
   return (
     <div className="w-full h-screen  rounded-2xl overflow-hidden  relative">
@@ -179,6 +192,7 @@ useGSAP(() => {
         <div
           onClick={() => {
             setpanelopen(setvehiclepanel(false));
+             
           }}
           className="flex  "
         >
@@ -240,9 +254,24 @@ useGSAP(() => {
         </div>
 
         {/* Confirm Button */}
-        <button className="w-full mt-1 bg-black text-white py-2 text-sm rounded-lg  hover:bg-gray-800 transition">
+        <button
+          onClick={() => {
+            setvehiclepanel(false);
+            setconfirmridepanel(true);
+          }}
+          className="w-full mt-1 bg-black text-white py-2 text-sm rounded-lg  hover:bg-gray-800 transition"
+        >
           Confirm Ride
         </button>
+      </div>
+
+      {/* Confirm Ride Panel */}
+
+      <div
+        ref={confirmridepanelref}
+        className="fixed bottom-0 w-full bg-white overflow-hidden h-0"
+      >
+        <Confirmride setconfirmridepanel={setconfirmridepanel} />
       </div>
     </div>
   );

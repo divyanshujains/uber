@@ -6,6 +6,8 @@ import { CaptainDataContext } from "../context/Captaincontext";
 const Captainlogin = () => {
 
   const navigate = useNavigate();
+   
+  
 
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
